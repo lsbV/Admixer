@@ -6,9 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Test2_Sudoku\" />
-    <Folder Include="Test1_Hedgehog\" />
-  </ItemGroup>
-
 </Project>
