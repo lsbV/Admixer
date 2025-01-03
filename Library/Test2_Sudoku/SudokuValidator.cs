@@ -30,29 +30,28 @@ public class SudokuValidator
     private static bool ColumnsAreValid(int[][] data)
     {
         var columns = Enumerable.Range(0, LengthOfSubArray - 1)
-            .Select(colIndex => data
-                .Where(row => row.Length > colIndex)
-                .Select(row => row[colIndex]));
+            .Select(colIndex => data.Select(row => row[colIndex]));
 
         return columns.Select(colum => new HashSet<int>(colum)).All(set => set.Count == CountOfUniqueValuesInCombination);
     }
 
     private static bool AreasAreValid(int[][] data)
     {
-        var subGrids = Enumerable.Range(0, AreaSize)
-            .SelectMany(rowBlock => Enumerable.Range(0, AreaSize)
-                .Select(colBlock => Enumerable.Range(0, AreaSize)
-                    .Select(rowOffset => Enumerable.Range(0, AreaSize)
-                        .Select(colOffset => GetDataByOffset(rowBlock, colBlock, rowOffset, colOffset, data))
-                        .ToArray())
-                    .ToArray()))
-        .ToList();
+        var areas = Enumerable.Range(0, AreaSize)
+            .SelectMany(rowAreaIndex => Enumerable.Range(0, AreaSize)
+                .Select(columnAreaIndex => Enumerable.Range(0, AreaSize)
+                    .Select(rowIndexInsideArea => Enumerable.Range(0, AreaSize)
+                        .Select(columnIndexInsideArea =>
+                            GetDataByOffset(rowAreaIndex, columnAreaIndex, rowIndexInsideArea, columnIndexInsideArea, data)))
+                )).Select(area => area.SelectMany(item => item));
 
-        return subGrids.Select(area => new HashSet<int>(area.SelectMany(item => item))).All(set => set.Count == 9);
+        return areas.Select(area => new HashSet<int>(area)).All(set => set.Count == CountOfUniqueValuesInCombination);
     }
 
-    private static int GetDataByOffset(int row, int column, int rowOffset, int columnOffset, int[][] data)
+    private static int GetDataByOffset(int rowAreaIndex, int columnAreaIndex, int rowIndexInsideArea, int columnIndexInsideArea, int[][] data)
     {
-        return data[row * AreaSize + rowOffset][column * AreaSize + columnOffset];
+        var row = rowAreaIndex * AreaSize + rowIndexInsideArea;
+        var column = columnAreaIndex * AreaSize + columnIndexInsideArea;
+        return data[row][column];
     }
 }
